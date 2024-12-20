@@ -1,0 +1,11 @@
+[package]
+name = "merkel-tree-rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+hex = "0.4"
+hexstring = "0.1.4"
+num-bigint = "0.4"
+num-traits = "0.2"
+thiserror = "2.0.8"
