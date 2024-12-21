@@ -63,13 +63,32 @@ pub fn make_merkle_tree(leaves: &[BytesLike], node_hash: NodeHash) -> Vec<HexStr
         let left = &tree[left_child_index(i)];
         let right = &tree[right_child_index(i)];
         tree[i] = node_hash(&hex::decode(left).expect("Invalid hex"), &hex::decode(right).expect("Invalid hex"));
-        println!("i is {:?}", i);
-        println!("tree[i]: {:?}", tree[i]);
+        // println!("i is {:?}", i);
+        // println!("tree[i]: {:?}", tree[i]);
 
     }
 
     tree
 }
+
+
+pub fn get_proof(tree: &[HexString], mut index: usize) -> Vec<HexString> {
+    
+    let tree_bytes: Vec<BytesLike> = tree.iter().map(|hex_str| to_bytes(hex_str)).collect();
+
+    let mut proof = Vec::new();
+
+    while index > 0 {
+        let sibling = sibling_index(index); 
+        if let Some(sibling_index) = sibling {
+            proof.push(to_hex(&tree_bytes[sibling_index]));
+        }
+        index = parent_index(index).unwrap(); 
+    }
+
+    proof
+}
+
 
 
 
@@ -92,18 +111,21 @@ mod tests {
 
         
         let expected_tree = vec![
-            "75baacf0502fe4b13d10e8c703a560b143a4caf924c729309db81761551c9e9d",          // Root node
-            "5a933e4f700f4e57610654229a5fd76c1b46f3ed37b5af1bd12ef7258edd4b79",   // Left internal node
-            "3614eb8d39b2e39b06d70e3198afd9170a4a35726d55ca9757af151353da27ca",   // Right internal node
-            "deadbeef",
-            "789abc",
-            "123456",
-            "abcdef",                     
+            "75baacf0502fe4b13d10e8c703a560b143a4caf924c729309db81761551c9e9d".to_string(),          // Root node
+            "5a933e4f700f4e57610654229a5fd76c1b46f3ed37b5af1bd12ef7258edd4b79".to_string(),   // Left internal node
+            "3614eb8d39b2e39b06d70e3198afd9170a4a35726d55ca9757af151353da27ca".to_string(),   // Right internal node
+            "deadbeef".to_string(),
+            "789abc".to_string(),
+            "123456".to_string(),
+            "abcdef".to_string(),                     
          ];
 
+         let proof = get_proof(&expected_tree, 3);
+         println!("proof: {:?}", proof);
+//proof: ["789abc", "3614eb8d39b2e39b06d70e3198afd9170a4a35726d55ca9757af151353da27ca"]
         
         let tree = make_merkle_tree(&leaves, standard_node_hash);
-        println!("tree: {:?}", tree);
+        //println!("tree: {:?}", tree);
 
         
         assert_eq!(tree.len(), 2 * leaves.len() - 1, "Tree size mismatch.");
