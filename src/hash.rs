@@ -2,6 +2,8 @@ use ethers::abi::{encode, Token};
 use sha3::{Digest, Keccak256};
 use crate::bytes::{BytesLike, HexString, concat_bytes, compare, to_hex};
 
+pub type NodeHash = fn(&BytesLike, &BytesLike) -> HexString;
+pub type LeafHash<T> = fn(&T) -> HexString;
 
 pub fn standard_leaf_hash( values: &[Token]) -> HexString {
     

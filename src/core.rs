@@ -1,5 +1,8 @@
-use core::error;
-use crate::bytes::BytesLike;
+
+//use hexstring::HexString;
+
+use crate::bytes::{BytesLike,HexString,to_hex,to_bytes};
+use crate::hash::{standard_leaf_hash, standard_node_hash,NodeHash,LeafHash};
 
 
 
@@ -39,6 +42,84 @@ pub fn is_internal_node(i: usize, tree_size: usize) -> bool {
 
 pub fn is_leaf_node(i: usize, tree_size: usize) -> bool {
     is_tree_node(i, tree_size) && !is_internal_node(i, tree_size)
+}
+
+
+
+
+
+pub fn make_merkle_tree(leaves: &[BytesLike], node_hash: NodeHash) -> Vec<HexString> {
+    let num_leaves = leaves.len();
+    let tree_size = 2 * num_leaves - 1;
+    let mut tree = vec![String::new(); tree_size];
+
+    
+    for (i, leaf) in leaves.iter().enumerate() {
+        tree[tree_size - 1 - i] = to_hex(leaf);
+    }
+
+    // Compute internal nodes
+    for i in (0..(tree_size - num_leaves)).rev() {
+        let left = &tree[left_child_index(i)];
+        let right = &tree[right_child_index(i)];
+        tree[i] = node_hash(&hex::decode(left).expect("Invalid hex"), &hex::decode(right).expect("Invalid hex"));
+        println!("i is {:?}", i);
+        println!("tree[i]: {:?}", tree[i]);
+
+    }
+
+    tree
+}
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+
+    
+
+    #[test]
+    fn test_make_merkle_tree() {
+        
+        let leaves = vec![
+            to_bytes("0xabcdef"),
+            to_bytes("0x123456"),
+            to_bytes("0x789abc"),
+            to_bytes("0xdeadbeef"),
+        ];
+
+        
+        let expected_tree = vec![
+            "75baacf0502fe4b13d10e8c703a560b143a4caf924c729309db81761551c9e9d",          // Root node
+            "5a933e4f700f4e57610654229a5fd76c1b46f3ed37b5af1bd12ef7258edd4b79",   // Left internal node
+            "3614eb8d39b2e39b06d70e3198afd9170a4a35726d55ca9757af151353da27ca",   // Right internal node
+            "deadbeef",
+            "789abc",
+            "123456",
+            "abcdef",                     
+         ];
+
+        
+        let tree = make_merkle_tree(&leaves, standard_node_hash);
+        println!("tree: {:?}", tree);
+
+        
+        assert_eq!(tree.len(), 2 * leaves.len() - 1, "Tree size mismatch.");
+
+        
+        for (i, expected) in expected_tree.iter().enumerate() {
+            assert_eq!(
+                tree[i],
+                *expected,
+                "Node {} mismatch. Expected: {}, Got: {}",
+                i,
+                expected,
+                tree[i]
+            );
+        }
+    }
 }
 
 
