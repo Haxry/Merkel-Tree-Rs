@@ -8,15 +8,15 @@ pub type LeafHash<T> = fn(&T) -> HexString;
 pub fn standard_leaf_hash( values: &[Token]) -> HexString {
     
     let abi_encoded = encode(values);
-    println!("abi_encoded: {:?}", abi_encoded);
+    //println!("abi_encoded: {:?}", abi_encoded);
 
     
     let first_hash = Keccak256::digest(&abi_encoded);
-    println!("first_hash: {:?}", first_hash);
+    //println!("first_hash: {:?}", first_hash);
     let second_hash = Keccak256::digest(&first_hash);
-    println!("second_hash: {:?}", second_hash);
+    //println!("second_hash: {:?}", second_hash);
     let result=to_hex(&second_hash.to_vec());
-    println!("to_hex: {:?}", result);
+    //println!("to_hex: {:?}", result);
     result
 }
 
@@ -25,11 +25,11 @@ pub fn standard_node_hash(a: &BytesLike, b: &BytesLike) -> HexString {
     let mut sorted_nodes = vec![a.clone(), b.clone()];
     //sorted_nodes.sort_by(|x, y| compare(x, y));
     let concatenated = concat_bytes(&sorted_nodes);
-    println!("concatenated: {:?}", concatenated);
+    //println!("concatenated: {:?}", concatenated);
     let hash = Keccak256::digest(&concatenated);
-    println!("hash: {:?}", hash);
+    //println!("hash: {:?}", hash);
     let Result= to_hex(&hash.to_vec());
-    println!("Result: {:?}", Result);
+    //println!("Result: {:?}", Result);
     Result
 }
 
