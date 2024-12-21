@@ -4,20 +4,23 @@ use hex::{decode as hex_decode, encode as hex_encode};
 use num_bigint::BigInt;
 
 
-// Type Definitions
 
-/// Represents a hexadecimal string.
 pub type HexString = String;
 
-/// Represents bytes-like data.
+
 pub type BytesLike = Vec<u8>;
 
-// Utility Functions
 
-/// Converts a hexadecimal string to bytes.
-/// Panics if the input is not valid hexadecimal.
 pub fn to_bytes(hex_str: &str) -> BytesLike {
-    hex_decode(hex_str).expect("Invalid hexadecimal string")
+    
+    let stripped = if hex_str.starts_with("0x") {
+        &hex_str[2..]
+    } else {
+        hex_str
+    };
+
+    
+    hex_decode(stripped).expect("Invalid hexadecimal string")
 }
 
 /// Converts bytes to a hexadecimal string.

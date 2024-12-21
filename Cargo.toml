@@ -4,8 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+ethers = "2.0.14"
 hex = "0.4"
 hexstring = "0.1.4"
 num-bigint = "0.4"
 num-traits = "0.2"
+sha3 = "0.10.8"
 thiserror = "2.0.8"
